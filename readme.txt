@@ -1,4 +1,4 @@
-This Project is a simple back-end webserver that can handle:
-  CRUD Requests
-  User Login system with a hierarcy
-  Data is stored in a database
+This Project is a simple back-end webserver that can:
+  Handle CRUD Requests
+  Allow users to login with varying permissions
+  Store data is stored in a database
