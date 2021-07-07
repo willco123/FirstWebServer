@@ -5,8 +5,10 @@
 const express = require('express');
 const homepage  = require('../routes/homepage');
 const loginPage = require('../routes/loginPage');
+const postPage = require('../routes/PostPage');
 
 module.exports = (app) => {
   app.use(homepage);
   app.use(loginPage);
+  app.use(postPage);
 };
