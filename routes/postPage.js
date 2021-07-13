@@ -3,7 +3,7 @@
 const express = require('express');
 const router = express.Router();
 
-router.get('/PostPage', (req,res) =>{
+router.get('/', (req,res) =>{
   res.send('This route will handle CRUD requests </br>\
             and store the corresponding data in a database')
 });

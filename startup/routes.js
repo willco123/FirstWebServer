@@ -8,7 +8,8 @@ const loginPage = require('../routes/loginPage');
 const postPage = require('../routes/PostPage');
 
 module.exports = (app) => {
-  app.use(homepage);
-  app.use(loginPage);
-  app.use(postPage);
+  app.use(express.json());//Need this to parse JSON objects
+  app.use('/', homepage);
+  app.use('/LoginPage',loginPage);
+  app.use('/PostPage', postPage);
 };
