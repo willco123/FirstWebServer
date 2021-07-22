@@ -1,2 +1,4 @@
 node_modules/
 ProjectIdeasAndProgression.txt
+.env
+routes/usersOld

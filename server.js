@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 
+require('./startup/config');
+require('./startup/db');
 require('./startup/routes')(app)
 //This module should handle all server initialisation
 
