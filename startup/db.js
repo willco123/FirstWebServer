@@ -1,7 +1,6 @@
 const Pool = require('pg').Pool;
 require('dotenv').config();
-console.log(process.env.PGUSER)
-
+const logger = require('winston');
 const pool = new Pool({//This instance stores the database connection
   user: process.env.PGUSER,
   host: process.env.PGHOST,
