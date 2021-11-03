@@ -3,3 +3,4 @@ ProjectIdeasAndProgression.txt
 .env
 routes/usersOld
 **/*.log
+logs/

@@ -2,10 +2,28 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+//const userLoginSchema = require('../middleware/validators');
 const db = require('../startup/db');
+const {checkSchema, body, validationResult} = require('express-validator');
+//const {userLoginSchema} = require('../middleware/validators');
+const logger = require('winston');
+
+const userLoginSchema = {
+  password: {
+    isStrongPassword: {
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minNumbers: 1
+    },
+    errorMessage: "Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number"
+    },
+
+}
 
 
 router.get('/', async (req,res) => {
+
   try{
   users = await db.query('SELECT * FROM users')
   res.send(users.rows)
@@ -16,14 +34,24 @@ router.get('/', async (req,res) => {
 
 });
 
-router.post('/', async (req,res,next) => {
+router.post('/', checkSchema(userLoginSchema), async (req,res,next) => {
 
-  const {username, password, rank} = req.body;
+  const errors = validationResult(req);
+  const {username, password} = req.body;
+  logger.info('The error stack is: \n%o', errors)//When using winston, user string interpolation when logging JSON objects
+
+
+  //if (errors) return res.status(400).send(errors.array())
+
+
 
   //need to handle promise rejection
   try{
-    await db.query('INSERT INTO users (name, password, rank)\
-                    VALUES($1, $2, $3)', [username, password, rank] );
+    var usernameExists = await db.query('SELECT * FROM users WHERE name = $1', [req.body.username]);
+    if (usernameExists.rowCount) return res.status(400).send('Username Is already Taken')//Ensure uniqueness
+
+    await db.query('INSERT INTO users (name, password)\
+                    VALUES($1, $2)', [username, password] );
     res.status(201).send('Successfully added new user');
 
   }
