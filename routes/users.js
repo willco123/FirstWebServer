@@ -8,11 +8,21 @@ const logger = require('winston');
 const _ = require('lodash');
 
 
-
 router.get('/', async (req,res) => {
-  //Is JWT in response?
+
   try{
   users = await db.query('SELECT * FROM users')
+  res.send(users.rows)
+  }
+  catch(err){
+    console.log(err.stack);
+  }
+});
+
+router.get('/:id', async (req,res) => {
+  //Is JWT in response?
+  try{
+  users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])
   res.send(users.rows)
   }
   catch(err){
@@ -27,7 +37,7 @@ router.post('/', async (req,res) => {
 
   const {username, password, email} = req.body;
   
-  console.log(new Date())
+
   //need to handle promise rejection
   try{
     var usernameExists = await db.query('SELECT * FROM users WHERE username = $1', [username]);
@@ -54,6 +64,10 @@ router.post('/', async (req,res) => {
 
 
 router.put('/:id', async (req,res) => {//Make sure to change ID's to random generated strings??
+  const {error} = validateUser(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+
   const id = req.params.id;
   const {username, password, rank} = req.body;
 
@@ -64,7 +78,7 @@ router.put('/:id', async (req,res) => {//Make sure to change ID's to random gene
                     WHERE id = $4',
                     [username, password, rank, id]);
     //return modified user
-    res.status(200).send('alles gut');
+    res.status(200).send('Record Successfully Updated');
   }
   catch(err){
     console.log(err.stack)
