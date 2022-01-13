@@ -12,8 +12,9 @@ const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
 
   format: format.combine(
-  format.label({ label: path.basename(process.mainModule.filename) }),
+  format.label({ label: path.basename(require.main.filename) }),
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+  format.errors({stack: true})
 
   ),
 

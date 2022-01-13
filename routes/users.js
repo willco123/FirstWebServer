@@ -2,28 +2,15 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
-//const userLoginSchema = require('../middleware/validators');
 const db = require('../startup/db');
-const {checkSchema, body, validationResult} = require('express-validator');
-//const {userLoginSchema} = require('../middleware/validators');
+const {validateUser, generateAuthToken} = require('../validation/validators');
 const logger = require('winston');
+const _ = require('lodash');
 
-const userLoginSchema = {
-  password: {
-    isStrongPassword: {
-      minLength: 8,
-      minLowercase: 1,
-      minUppercase: 1,
-      minNumbers: 1
-    },
-    errorMessage: "Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number"
-    },
-
-}
 
 
 router.get('/', async (req,res) => {
-
+  //Is JWT in response?
   try{
   users = await db.query('SELECT * FROM users')
   res.send(users.rows)
@@ -34,36 +21,39 @@ router.get('/', async (req,res) => {
 
 });
 
-router.post('/', checkSchema(userLoginSchema), async (req,res,next) => {
+router.post('/', async (req,res) => {
+  const {error} = validateUser(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
-  const errors = validationResult(req);
-  const {username, password} = req.body;
-  logger.info('The error stack is: \n%o', errors)//When using winston, user string interpolation when logging JSON objects
-
-
-  //if (errors) return res.status(400).send(errors.array())
-
-
-
+  const {username, password, email} = req.body;
+  
+  console.log(new Date())
   //need to handle promise rejection
   try{
-    var usernameExists = await db.query('SELECT * FROM users WHERE name = $1', [req.body.username]);
+    var usernameExists = await db.query('SELECT * FROM users WHERE username = $1', [username]);
     if (usernameExists.rowCount) return res.status(400).send('Username Is already Taken')//Ensure uniqueness
 
-    await db.query('INSERT INTO users (name, password)\
-                    VALUES($1, $2)', [username, password] );
-    res.status(201).send('Successfully added new user');
+    var emailExists = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (emailExists.rowCount) return res.status(400).send('Email Is already Taken')//Ensure uniqueness
+
+    await db.query('INSERT INTO users (username, password, email, created_on)\
+                    VALUES($1, $2, $3, $4)', [username, password, email, new Date()] );
+    //res.status(201).send('Successfully added new user');
+    const token = generateAuthToken();
+    res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
   }
   catch(err){
     console.log(err.stack);
   }
 
+    // const token = generateAuthToken;
+    // res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
 });
 
 
-router.put('/:id', async (req,res) => {//Make sure to change ID's to random generated strings
+router.put('/:id', async (req,res) => {//Make sure to change ID's to random generated strings??
   const id = req.params.id;
   const {username, password, rank} = req.body;
 
