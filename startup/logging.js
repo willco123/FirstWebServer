@@ -37,6 +37,7 @@ const logger = winston.createLogger({
     }),
     new winston.transports.Console({
       handleExceptions: true,//seems to effect both log files & console
+      handleRejections: true,
       format: format.combine(
         format.colorize(),
         format.splat(),//Useful for logging JSON objects

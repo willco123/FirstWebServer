@@ -70,14 +70,14 @@ router.put('/:id', async (req,res) => {//Make sure to change ID's to random gene
 
 
   const id = req.params.id;
-  const {username, password, rank} = req.body;
+  const {username, password, email} = req.body;
 
 
 
   try{
-    await db.query('UPDATE users SET name = $1, password = $2, rank = $3 \
-                    WHERE id = $4',
-                    [username, password, rank, id]);
+    await db.query('UPDATE users SET username = $1, password = $2, email = $3 \
+                    WHERE user_id = $4',
+                    [username, password, email, id]);
     //return modified user
     res.status(200).send('Record Successfully Updated');
   }
