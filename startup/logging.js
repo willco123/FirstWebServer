@@ -36,7 +36,7 @@ const logger = winston.createLogger({
       )
     }),
     new winston.transports.Console({
-      //handleExceptions: true,//seems to effect both log files & console
+      handleExceptions: true,//seems to effect both log files & console
       format: format.combine(
         format.colorize(),
         format.splat(),//Useful for logging JSON objects
@@ -56,7 +56,7 @@ const logger = winston.createLogger({
 //     }));
 //   }
 
-winston.add(logger)//Add to the logger, dont need to export the logger above now
+//winston.add(logger)//Add to the logger, dont need to export the logger above now
 //Winston seems to add the logger anyway, so stuff will be logged twice in this file
 
 // module.exports = {

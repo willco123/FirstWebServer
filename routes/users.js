@@ -4,7 +4,7 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const db = require('../startup/db');
 const {validateUser, generateAuthToken} = require('../validation/validators');
-const logger = require('winston');
+//const logger = require('winston');
 const _ = require('lodash');
 
 
@@ -17,6 +17,7 @@ router.get('/', async (req,res) => {
   catch(err){
     console.log(err.stack);
   }
+  
 });
 
 router.get('/:id', async (req,res) => {
