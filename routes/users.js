@@ -89,7 +89,7 @@ router.put('/:id', async (req,res) => {//Make sure to change ID's to random gene
 
 router.delete('/:id', async (req,res) => {
   try{
-    deletedItem = await db.query('DELETE FROM users WHERE id=$1 RETURNING *',
+    deletedItem = await db.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
     if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
       return res.status(404)
