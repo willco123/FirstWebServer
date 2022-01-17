@@ -6,6 +6,8 @@ const db = require('../startup/db');
 const {validateUser, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
 const _ = require('lodash');
+const bcrypt= require("bcrypt");
+
 
 
 router.get('/', async (req,res) => {
@@ -36,7 +38,7 @@ router.post('/', async (req,res) => {
   const {error} = validateUser(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const {username, password, email} = req.body;
+  var {username, password, email} = req.body;
   
 
   //need to handle promise rejection
@@ -46,6 +48,11 @@ router.post('/', async (req,res) => {
 
     var emailExists = await db.query('SELECT * FROM users WHERE email = $1', [email]);
     if (emailExists.rowCount) return res.status(400).send('Email Is already Taken')//Ensure uniqueness
+
+    //Hash and Salt User Password
+    const salt = await bcrypt.genSalt(10)
+    password = await bcrypt.hash(password, salt);
+    console.log(password)
 
     await db.query('INSERT INTO users (username, password, email, created_on)\
                     VALUES($1, $2, $3, $4)', [username, password, email, new Date()] );
