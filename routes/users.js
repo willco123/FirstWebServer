@@ -10,7 +10,7 @@ const bcrypt= require("bcrypt");
 
 
 
-router.get('/', async (req,res) => {
+router.get('/', [auth, admin], async (req,res) => {
 
   try{
   users = await db.query('SELECT * FROM users')
@@ -22,7 +22,7 @@ router.get('/', async (req,res) => {
   
 });
 
-router.get('/:id', async (req,res) => {
+router.get('/:id', [auth, admin], async (req,res) => {
   //Is JWT in response?
   try{
   users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])

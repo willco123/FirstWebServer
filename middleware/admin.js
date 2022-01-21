@@ -2,7 +2,9 @@
 
 
 module.exports = function(req, res, next){
+  console.log(req.user)
   if (req.user.rank != "Admin") return res.status(403).send('Forbidden');
+  
   next();
 
 }
