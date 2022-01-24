@@ -22,7 +22,7 @@ router.get('/', [auth], async (req,res) => {
   
 });
 
-router.get('/:id', [auth, admin], async (req,res) => {
+router.get('/:id', [auth], async (req,res) => {
   //Is JWT in response?
   try{
   users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])
@@ -52,17 +52,11 @@ router.post('/', async (req,res) => {
     //Hash and Salt User Password
     const salt = await bcrypt.genSalt(10)
     password = await bcrypt.hash(password, salt);
-    console.log(password)
 
-    await db.query('INSERT INTO users (username, password, email, created_on)\
-                    VALUES($1, $2, $3, $4)', [username, password, email, new Date()] );
-    //res.status(201).send('Successfully added new user');
-
-    //const token = generateAuthToken(id, rank);//Maybe pass id/rank here?
-    const user  = await db.query('SELECT * FROM users WHERE username = $1', [username]);
-    console.log(user)
-    console.log("user is ", user.rows[0].user_id)
-    console.log(user.rows.user_id)
+    const user = await db.query('INSERT INTO users (username, password, email, created_on)\
+                    VALUES($1, $2, $3, $4) RETURNING user_id', [username, password, email, new Date()] );
+    
+    //Get token
     const token = generateAuthToken(user.rows[0].user_id)
     res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
@@ -71,13 +65,11 @@ router.post('/', async (req,res) => {
     console.log(err.stack);
   }
 
-    // const token = generateAuthToken;
-    // res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
 });
 
 
-router.put('/:id', async (req,res) => {//Make sure to change ID's to random generated strings??
+router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's to random generated strings??
   const {error} = validateUser(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -100,7 +92,7 @@ router.put('/:id', async (req,res) => {//Make sure to change ID's to random gene
 
 })
 
-router.delete('/:id', async (req,res) => {
+router.delete('/:id', [auth, admin], async (req,res) => {
   try{
     deletedItem = await db.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
@@ -113,12 +105,6 @@ router.delete('/:id', async (req,res) => {
     console.log(err.stack)
   }
 })
-
-
-function isPositiveInt(str){//extract this if ever re-used
-  var output = Math.floor(Number(str));
-  return String(output) === str && output >= 0;
-}
 
 
 module.exports = router;

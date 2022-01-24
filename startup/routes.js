@@ -12,6 +12,6 @@ module.exports = (app) => {
   app.use(express.json());//Need this to parse JSON objects
   app.use('/auth', auth);
   app.use('/', homepage);
-  app.use('/Users',users);
-  app.use('/PostPage', postPage);
+  app.use('/users',users);
+  app.use('/post', postPage);
 };
