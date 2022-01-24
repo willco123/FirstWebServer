@@ -48,13 +48,11 @@ router.post('/', [auth], async (req,res) => {
   try{//Transaction here to update "number of posts in users"
     post = await db.query('INSERT INTO posts (time_of_post, message)\
                   VALUES($1, $2) RETURNING post_id', [new Date(), message] );
-
-    
-  
     await db.query('UPDATE users SET number_of_posts = number_of_posts + 1\
                   WHERE user_id = $1 returning user_id', [user.id] );
     await db.query('INSERT INTO users_posts (user_id, post_id)\
                   VALUES($1, $2)', [user.id, post.rows[0].post_id] );
+    //       
     //await db.query('BEGIN');
     //text = 'INSERT INTO users_posts (user_id, post_id) VALUES ($1, $2)'
     //values = [user.id, post.rows[0].post_id]
