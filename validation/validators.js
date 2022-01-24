@@ -26,8 +26,8 @@
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 
-generateAuthToken = function() {
-  const token = jwt.sign({_id: this._id, isAdmin: this.isAdmin }, process.env.SECRET_KEY);
+generateAuthToken = function(user_id, rank = "standard") {
+  const token = jwt.sign({id: user_id, isAdmin: rank}, process.env.SECRET_KEY, {expiresIn: 86400});//payload will just be id for now
   return token;
 }
 

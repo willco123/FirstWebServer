@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 function auth(req, res, next){
   const token = req.header('auth-token');
   if (!token) return res.status(401).send('No token provided, please authorize account at /auth');
-  console.log(process.env.SECRET_KEY)
+  
   try{
     var decoded = jwt.verify(token, process.env.SECRET_KEY)
     console.log(decoded);
@@ -18,5 +18,18 @@ function auth(req, res, next){
   }
 }
 
-module.exports = auth;
+function admin(req, res, next){
+  console.log(req.user)
+  if (req.user.isAdmin != "admin") return res.status(403).send('Forbidden');
+  
+  next();
+
+}
+
+
+
+module.exports = {
+auth,
+admin
+};
 

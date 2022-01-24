@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const auth = require('../middleware/auth');
-const admin = require('../middleware/admin');
+const {auth, admin} = require('../middleware/auth');
+//const admin = require('../middleware/admin');
 const db = require('../startup/db');
 const {validateUser, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
@@ -10,7 +10,7 @@ const bcrypt= require("bcrypt");
 
 
 
-router.get('/', [auth, admin], async (req,res) => {
+router.get('/', [auth], async (req,res) => {
 
   try{
   users = await db.query('SELECT * FROM users')
@@ -57,7 +57,13 @@ router.post('/', async (req,res) => {
     await db.query('INSERT INTO users (username, password, email, created_on)\
                     VALUES($1, $2, $3, $4)', [username, password, email, new Date()] );
     //res.status(201).send('Successfully added new user');
-    const token = generateAuthToken();
+
+    //const token = generateAuthToken(id, rank);//Maybe pass id/rank here?
+    const user  = await db.query('SELECT * FROM users WHERE username = $1', [username]);
+    console.log(user)
+    console.log("user is ", user.rows[0].user_id)
+    console.log(user.rows.user_id)
+    const token = generateAuthToken(user.rows[0].user_id)
     res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
   }
