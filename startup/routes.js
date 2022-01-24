@@ -13,5 +13,5 @@ module.exports = (app) => {
   app.use('/auth', auth);
   app.use('/', homepage);
   app.use('/users',users);
-  app.use('/post', postPage);
+  app.use('/posts', postPage);
 };

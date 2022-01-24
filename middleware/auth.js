@@ -9,7 +9,8 @@ function auth(req, res, next){
   
   try{
     var decoded = jwt.verify(token, process.env.SECRET_KEY)
-    req.user = decoded
+    res.locals.user = decoded
+  
     next()
   }
   catch(ex){
@@ -18,7 +19,7 @@ function auth(req, res, next){
 }
 
 function admin(req, res, next){
-  if (req.user.isAdmin != "admin") return res.status(403).send('Forbidden');
+  if (res.locals.user.isAdmin != "admin") return res.status(403).send('Forbidden');
   
   next();
 

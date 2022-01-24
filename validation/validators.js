@@ -42,9 +42,17 @@ function validateUser(user){
     return schema.validate(user);
 };
 
+function validateMessage(message){
+  const schema = Joi.object({
+      message: Joi.string().min(1).max(300).required()
+  });
+  return schema.validate(message);
+};
+
 
 module.exports =  {
   validateUser,
+  validateMessage,
   generateAuthToken
 }
 

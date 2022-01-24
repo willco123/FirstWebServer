@@ -24,7 +24,9 @@ router.get('/', [auth], async (req,res) => {
 
 router.get('/:id', [auth], async (req,res) => {
   //Is JWT in response?
+
   try{
+
   users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])
   res.send(users.rows)
   }
