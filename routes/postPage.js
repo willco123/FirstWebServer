@@ -45,10 +45,24 @@ router.post('/', [auth], async (req,res) => {
   const message = req.body.message;
   const user = res.locals.user;
   
-  try{
-   await db.query('INSERT INTO posts (user_id, time_of_post, message)\
-                    VALUES($1, $2, $3)', [user.id, new Date(), message] );
+  try{//Transaction here to update "number of posts in users"
+    post = await db.query('INSERT INTO posts (time_of_post, message)\
+                  VALUES($1, $2) RETURNING post_id', [new Date(), message] );
+
+    
+  
+    await db.query('UPDATE users SET number_of_posts = number_of_posts + 1\
+                  WHERE user_id = $1 returning user_id', [user.id] );
+    await db.query('INSERT INTO users_posts (user_id, post_id)\
+                  VALUES($1, $2)', [user.id, post.rows[0].post_id] );
+    //await db.query('BEGIN');
+    //text = 'INSERT INTO users_posts (user_id, post_id) VALUES ($1, $2)'
+    //values = [user.id, post.rows[0].post_id]
+    //values = [12,6]
+    //await db.query(text,values)
+    //await db.query('COMMIT');
     res.status(200).send('Message Added')
+
 
 
   }
@@ -82,9 +96,14 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 })
 
 router.delete('/:id', [auth, admin], async (req,res) => {
-  try{
-    deletedItem = await db.query('DELETE FROM posts WHERE post_id=$1 RETURNING *',
-                                   [req.params.id])
+
+  try{//delete null if id = 0
+    if (req.params.id === '0') {// add transaction here? 
+      deletedItem = await db.query('DELETE FROM posts WHERE user_id IS NULL')
+    }
+    else {
+      deletedItem = await db.query('DELETE FROM posts WHERE post_id=$1 RETURNING *',[req.params.id])
+    }
     if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
       return res.status(404)
         .send('A message with the given ID was not found')
@@ -94,6 +113,8 @@ router.delete('/:id', [auth, admin], async (req,res) => {
     console.log(err.stack)
   }
 })
+
+
 
 
 module.exports = router;

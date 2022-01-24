@@ -8,6 +8,7 @@ const users = require('../routes/users');
 const postPage = require('../routes/PostPage');
 const auth = require('../routes/auth');
 
+
 module.exports = (app) => {
   app.use(express.json());//Need this to parse JSON objects
   app.use('/auth', auth);

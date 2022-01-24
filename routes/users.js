@@ -94,7 +94,7 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 
 })
 
-router.delete('/:id', [auth, admin], async (req,res) => {
+router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here? delete users posts if user is deleted aswell?
   try{
     deletedItem = await db.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
