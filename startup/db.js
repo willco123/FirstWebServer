@@ -1,6 +1,6 @@
 const Pool = require('pg').Pool;
 require('dotenv').config();
-//const logger = require('winston');
+
 const pool = new Pool({//This instance stores the database connection
   user: process.env.PGUSER,
   host: process.env.PGHOST,
@@ -9,24 +9,17 @@ const pool = new Pool({//This instance stores the database connection
   port: process.env.PGPORT
 })
 
+
+
 module.exports = {//Functions defined in this object will return methods that you can use on the DB
   async query(text,params){
     const res = await pool.query(text, params)
     return res
-  }
-}
+  },
+  async cliconnect(){
+    const client = await pool.connect()//does work
+    return client
+}}
 
-// pool.connect((err, client, release) => {
-//   if (err) {
-//     return console.error('Error acquiring client', err.stack)
-//   }
-//   client.query('SELECT * FROM users', (err, result) => {
-//     release()
-//     if (err) {
-//       return console.error('Error executing query', err.stack)
-//     }
-//     console.log(result.rows)
-//   })
-// })
 
 

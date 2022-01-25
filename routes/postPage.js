@@ -5,7 +5,6 @@
 const express = require('express');
 const router = express.Router();
 const {auth, admin} = require('../middleware/auth');
-//const admin = require('../middleware/admin');
 const db = require('../startup/db');
 const {validateMessage, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
@@ -14,16 +13,18 @@ const bcrypt= require("bcrypt");
 
 
 
+
+
+
 router.get('/', [auth], async (req,res) => {
-  //display all posts, recent first
+
   try{
-  posts = await db.query('SELECT * FROM posts')
-  res.send(posts.rows)
+    posts = await db.query('SELECT * FROM posts')
+    res.send(posts.rows)
   }
   catch(err){
     console.log(err.stack);
-  }
-  
+  } 
 });
 
 router.get('/:id', [auth, admin], async (req,res) => {
@@ -44,28 +45,35 @@ router.post('/', [auth], async (req,res) => {
 
   const message = req.body.message;
   const user = res.locals.user;
+  const client = await db.cliconnect()
   
   try{//Transaction here to update "number of posts in users"
-    post = await db.query('INSERT INTO posts (time_of_post, message)\
-                  VALUES($1, $2) RETURNING post_id', [new Date(), message] );
-    await db.query('UPDATE users SET number_of_posts = number_of_posts + 1\
-                  WHERE user_id = $1 returning user_id', [user.id] );
-    await db.query('INSERT INTO users_posts (user_id, post_id)\
-                  VALUES($1, $2)', [user.id, post.rows[0].post_id] );
-    //       
-    //await db.query('BEGIN');
-    //text = 'INSERT INTO users_posts (user_id, post_id) VALUES ($1, $2)'
-    //values = [user.id, post.rows[0].post_id]
-    //values = [12,6]
-    //await db.query(text,values)
-    //await db.query('COMMIT');
-    res.status(200).send('Message Added')
+    
+    await client.query('BEGIN')
+    
+    
+    post = await client.query('INSERT INTO posts (time_of_post, message)\
+                  VALUES($1, $2) RETURNING post_id', [new Date(), message]);
+                  
+    await client.query('UPDATE users SET number_of_posts = number_of_posts + 1\
+                  WHERE user_id = $1 returning user_id', [user.id]);
+                  
+    await client.query('INSERT INTO users_posts (user_id, post_id)\
+                  VALUES($1, $2)', [user.id, post.rows[0].post_id]);
+                  
+    await client.query('COMMIT')
+    
 
+    res.status(200).send('Message Added')
 
 
   }
   catch(err){
+    await client.query('ROLLBACK')
     console.log(err.stack);
+  }
+  finally{
+    client.release()
   }
 
 
