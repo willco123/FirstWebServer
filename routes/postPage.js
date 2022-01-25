@@ -63,7 +63,7 @@ router.post('/', [auth], async (req,res) => {
                   
     await client.query('COMMIT')
     
-
+    console.log('test')
     res.status(200).send('Message Added')
 
 
