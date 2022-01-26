@@ -71,15 +71,15 @@ router.post('/', async (req,res) => {
 });
 
 
-router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's to random generated strings??
-  const {error} = validateUser(req.body);
+router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's to random generated strings?? //This edit is for admins to change uname/password/email
+  const {error} = validateUser(req.body);             //There will be another page for users to change only password
   if (error) return res.status(400).send(error.details[0].message);
 
 
   const id = req.params.id;
   const {username, password, email} = req.body;
 
-
+  //add in salt/hash
 
   try{
     await db.query('UPDATE users SET username = $1, password = $2, email = $3 \
@@ -95,9 +95,16 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 })
 
 router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here? delete users posts if user is deleted aswell?
+  const client = await db.cliconnect()
   try{
-    deletedItem = await db.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
+    await client.query('BEGIN')
+    await client.query('DELETE FROM users_posts WHERE user_id=$1 RETURNING *',
+    [req.params.id])
+    //if i want to delete from posts aswell i can just get it here
+    deletedItem = await client.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
+    await client.query('COMMIT')
+
     if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
       return res.status(404)
         .send('A customer with the given ID was not found')
@@ -105,6 +112,9 @@ router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here?
   }
   catch(err){
     console.log(err.stack)
+    await client.query('ROLLBACK')
+  } finally{
+    client.release()
   }
 })
 
