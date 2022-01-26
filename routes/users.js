@@ -107,10 +107,9 @@ router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here?
     deletedItem = await client.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
     await client.query('COMMIT')
-    if (deletedItem.rowCount === 1)//If rowCount==0 no item found in table with that id, 1 otherwise
-      {await client.query('ROLLBACK')
+    if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
       return res.status(404)
-        .send('A customer with the given ID was not found')}
+        .send('A customer with the given ID was not found')
 
     res.status(201).send('Record Successfully deleted')
 
