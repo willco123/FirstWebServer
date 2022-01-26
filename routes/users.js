@@ -77,9 +77,11 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 
 
   const id = req.params.id;
-  const {username, password, email} = req.body;
+  var {username, password, email} = req.body;
 
   //add in salt/hash
+  const salt = await bcrypt.genSalt(10)
+  password = await bcrypt.hash(password, salt);
 
   try{
     await db.query('UPDATE users SET username = $1, password = $2, email = $3 \
@@ -97,6 +99,7 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here? delete users posts if user is deleted aswell?
   const client = await db.cliconnect()
   try{
+
     await client.query('BEGIN')
     await client.query('DELETE FROM users_posts WHERE user_id=$1 RETURNING *',
     [req.params.id])
@@ -104,14 +107,17 @@ router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here?
     deletedItem = await client.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
     await client.query('COMMIT')
-
-    if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
+    if (deletedItem.rowCount === 1)//If rowCount==0 no item found in table with that id, 1 otherwise
+      {await client.query('ROLLBACK')
       return res.status(404)
-        .send('A customer with the given ID was not found')
+        .send('A customer with the given ID was not found')}
+
     res.status(201).send('Record Successfully deleted')
+
   }
   catch(err){
     console.log(err.stack)
+    console.log('here roll back')
     await client.query('ROLLBACK')
   } finally{
     client.release()
