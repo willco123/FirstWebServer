@@ -45,10 +45,10 @@ router.post('/', [auth], async (req,res) => {
 
   const message = req.body.message;
   const user = res.locals.user;
-  const client = await db.cliconnect()
+  const client = await db.cliconnect()//get instance of client?
+
   
   try{//Transaction here to update "number of posts in users"
-    
     await client.query('BEGIN')
     
     
@@ -57,13 +57,13 @@ router.post('/', [auth], async (req,res) => {
                   
     await client.query('UPDATE users SET number_of_posts = number_of_posts + 1\
                   WHERE user_id = $1 returning user_id', [user.id]);
-                  
+                   
     await client.query('INSERT INTO users_posts (user_id, post_id)\
                   VALUES($1, $2)', [user.id, post.rows[0].post_id]);
-                  
+    
     await client.query('COMMIT')
     
-    console.log('test')
+    
     res.status(200).send('Message Added')
 
 
@@ -71,6 +71,7 @@ router.post('/', [auth], async (req,res) => {
   catch(err){
     await client.query('ROLLBACK')
     console.log(err.stack);
+    res.status(400).send('Transaction Failed')
   }
   finally{
     client.release()
@@ -91,9 +92,11 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 
 
   try{
-    await db.query('UPDATE posts SET message = $1 WHERE post_id = $2', [message, id]);
-    //return modified user
-    res.status(200).send('Record Successfully Updated');
+    updatedItem = await db.query('UPDATE posts SET message = $1 WHERE post_id = $2 RETURNING *', [message, id]);
+    if (updatedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
+    return res.status(404)
+      .send('A message with the given ID was not found')
+    res.status(200).send(updatedItem.rows[0]);
   }
   catch(err){
     console.log(err.stack)
@@ -103,20 +106,25 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 
 router.delete('/:id', [auth, admin], async (req,res) => {
 
-  try{//delete null if id = 0
-    if (req.params.id === '0') {// add transaction here? 
-      deletedItem = await db.query('DELETE FROM posts WHERE user_id IS NULL')
-    }
-    else {
-      deletedItem = await db.query('DELETE FROM posts WHERE post_id=$1 RETURNING *',[req.params.id])
-    }
+  const client = await db.cliconnect()
+  try{
+    await client.query('BEGIN')
+    await client.query('DELETE FROM users_posts WHERE post_id=$1',[req.params.id])
+    deletedItem = await client.query('DELETE FROM posts WHERE post_id = $1 RETURNING *',[req.params.id])
+    await client.query('COMMIT')
     if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
-      return res.status(404)
-        .send('A message with the given ID was not found')
+    return res.status(404)
+      .send('A message with the given ID was not found')
+
+
+
     res.status(201).send('Record Successfully deleted')
   }
   catch(err){
+    await client.query('ROLLBACK')
     console.log(err.stack)
+  } finally{
+    client.release()
   }
 })
 
