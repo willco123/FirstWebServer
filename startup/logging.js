@@ -2,9 +2,33 @@ const winston = require('winston');
 const {format} = winston
 const path = require('path')
 
-//Use process.on for global exception handling
-//This module should be ran once on startup, if I have to require it in other place then gotta change some stuff
-//Module currently executes once, and adds logger instance to winston, no export required
+
+
+
+
+
+
+
+
+// const logger = winston.createLogger({
+//     transports: [
+//         new winston.transports.Console()
+//     ]
+// });
+
+
+// //winston.add(console);
+
+
+
+
+
+
+
+
+// Use process.on for global exception handling
+// This module should be ran once on startup, if I have to require it in other place then gotta change some stuff
+// Module currently executes once, and adds logger instance to winston, no export required
 const logFormat = format.printf(info =>
   `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`
 );
@@ -20,7 +44,7 @@ const logger = winston.createLogger({
 
   transports: [
     new winston.transports.File({
-      //handleExceptions: false,
+      handleExceptions: false,
       filename: 'logs/error.log',
       level: 'error',
       format: format.combine(
@@ -47,6 +71,52 @@ const logger = winston.createLogger({
   ],
   //exitOnError: false
 });
+// winston.add(console);
+// winston.add(logger)
+// logger.info('Error message');
+
+
+
+console.log = function(){
+  return logger.info.apply(logger, arguments)
+}
+console.error = function(){
+  return logger.error.apply(logger, arguments)
+}
+console.info = function(){
+  return logger.warn.apply(logger, arguments)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//module.exports = logger
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // if (process.env.NODE_ENV !== 'production') {

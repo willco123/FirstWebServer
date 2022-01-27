@@ -8,10 +8,9 @@ const {auth, admin} = require('../middleware/auth');
 const db = require('../startup/db');
 const {validateMessage, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
+//const logger = require('../startup/logging');
 const _ = require('lodash');
 const bcrypt= require("bcrypt");
-
-
 
 
 
@@ -21,9 +20,11 @@ router.get('/', [auth], async (req,res) => {
   try{
     posts = await db.query('SELECT * FROM posts')
     res.send(posts.rows)
+    throw new Error('InvalidMonthNo');
   }
   catch(err){
     console.log(err.stack);
+    logger.error(err.stack)
   } 
 });
 
@@ -89,7 +90,7 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
   const id = req.params.id;
   const message = req.body.message;
 
-
+  
 
   try{
     updatedItem = await db.query('UPDATE posts SET message = $1 WHERE post_id = $2 RETURNING *', [message, id]);
@@ -104,7 +105,7 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
 
 })
 
-router.delete('/:id', [auth, admin], async (req,res) => {
+router.delete('/:id', [auth, admin], async (req,res) => {//what if we jump out of transaction early?
 
   const client = await db.cliconnect()
   try{
