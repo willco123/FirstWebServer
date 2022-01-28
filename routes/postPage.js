@@ -57,7 +57,7 @@ router.post('/', [auth], async (req,res) => {
                   VALUES($1, $2) RETURNING post_id', [new Date(), message]);
                   
     await client.query('UPDATE users SET number_of_posts = number_of_posts + 1\
-                  WHERE user_id = $1 returning user_id', [user.id]);
+                  WHERE user_id = $1', [user.id]);
                    
     await client.query('INSERT INTO users_posts (user_id, post_id)\
                   VALUES($1, $2)', [user.id, post.rows[0].post_id]);
