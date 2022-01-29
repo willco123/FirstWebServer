@@ -45,7 +45,7 @@ const logger = winston.createLogger({
   transports: [
     new winston.transports.File({
       handleExceptions: false,
-      filename: 'logs/error.log',
+      filename: '../logs/error.log',
       level: 'error',
       format: format.combine(
         format.errors({ stack: false }),
@@ -53,7 +53,7 @@ const logger = winston.createLogger({
       )
     }),
     new winston.transports.File({
-      filename: 'logs/combined.log',
+      filename: '../logs/combined.log',
       level: 'debug',
       format: format.combine(
         format.json(),

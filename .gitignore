@@ -7,3 +7,4 @@ logs/
 Legacy/
 currentworkingnotes.txt
 middleware/admin
+coverage/
