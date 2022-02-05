@@ -14,12 +14,9 @@ router.get('/', [auth], async (req,res) => {
 
   try{
   users = await db.query('SELECT * FROM users')
-  
-  res.json(users.rows)
-  
-  
-
+  return res.json(users.rows)
   }
+  
   catch(err){
     console.log(err.stack);
   }
@@ -124,7 +121,7 @@ router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here?
     console.log('here roll back')
     await client.query('ROLLBACK')
   } finally{
-    client.release()
+    client.release(true)
   }
 })
 
