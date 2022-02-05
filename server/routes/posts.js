@@ -4,7 +4,8 @@
 
 const express = require('express');
 const router = express.Router();
-const {auth, admin} = require('../middleware/auth');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const db = require('../startup/db');
 const {validateMessage, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
@@ -19,12 +20,13 @@ router.get('/', [auth], async (req,res) => {
 
   try{
     posts = await db.query('SELECT * FROM posts')
+
     res.send(posts.rows)
-    throw new Error('InvalidMonthNo');
+    
   }
   catch(err){
     console.log(err.stack);
-    logger.error(err.stack)
+    
   } 
 });
 
@@ -32,6 +34,8 @@ router.get('/:id', [auth, admin], async (req,res) => {
   //Is JWT in response?
   try{
   posts = await db.query('SELECT * FROM posts WHERE post_id = $1', [req.params.id])
+  if (posts.rowCount===0) return res.status(404).send('A record with that given id cannot be found')
+
   res.send(posts.rows[0].message)
   }
   catch(err){
@@ -134,24 +138,3 @@ router.delete('/:id', [auth, admin], async (req,res) => {//what if we jump out o
 
 module.exports = router;
 
-
-
-
-
-//So this page will act as message board/feed
-//Users can make a post with limited characters
-//It will display username/time of posting/message
-//User makes a post-> post is saved to datebase -> time of last post & total number of posts is saved in "users", can use transactions here for posting
-//In "posts" table user_id/time of message/message is logged in the database
-//only "auth" users can post
-//Users can search for specific posts (might not do this)
-//Admin can delete/edit any post
-//What happens if a user is delete (delete all there posts)
-
-////////////////////////TO DO////////////////////////////////////////////
-//Edit "last login time" to "last post time" in psql
-//add number of posts to users
-//add posts table to db
-//So stack CRUD requests, have them connect to the db and post to "posts"
-
-//posts post_id, user_id(fk), time of post, message

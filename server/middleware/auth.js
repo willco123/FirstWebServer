@@ -16,19 +16,17 @@ function auth(req, res, next){
   catch(ex){
     res.status(400).send('Invalid token')
   }
+
 }
 
-function admin(req, res, next){
-  if (res.locals.user.isAdmin != "admin") return res.status(403).send('Forbidden');
+// function admin(req, res, next){
+//   if (res.locals.user.isAdmin != "admin") return res.status(403).send('Forbidden');
   
-  next();
+//   next();
 
-}
+// }
+
+module.exports = auth;
 
 
-
-module.exports = {
-auth,
-admin
-};
 

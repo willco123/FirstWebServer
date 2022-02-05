@@ -1,26 +1,42 @@
-const app = require('../../app');
-// const request = require('supertest');
-// const pool = require('pg').Pool;
+jest.mock('../../middleware/auth', () => jest.fn((req,res,next) => next()));
+const auth = require('../../middleware/auth')
+const supertest = require('supertest');
+const router = require('../users');
+const { 
+        setupMockApp,
+        populateMockUser,
+        clearMockDB,
+        createMockUsers} = require('../../../tests/test-helpers');
+
+app = setupMockApp();
+app.use('/users', router);
+
+beforeEach( async () => {
+    await clearMockDB();
+    mockUsers = createMockUsers();
+    var {mockUser1, mockUser2, mockUser3} = mockUsers;
+    await populateMockUser(mockUser1);
+    await populateMockUser(mockUser2);
+    await populateMockUser(mockUser3);
+})
+
+afterEach(async () => {
+    await clearMockDB();
+})
+
+
+describe('/users', () => {
+  describe('get', () => {
+    it('Should call the middleware using the mock function', async () => {
+      const response = await supertest(app).get('/users');
+      expect(response.status).toBe(200);
+      await expect(auth).toHaveBeenCalled();
+    });
+  });
 
 
 
-// //Need to connect to DB
-// //Mock DB is called api_test
-// //Look into mock values
-// //Look into tokens aswell
 
-// describe("GET /", () => {
-//     test("Should return all", async () => {
-//       const response = await request(app).get("/posts");
-//       expect(response.statusCode).toBe(200);
-//       expect(response.type).toEqual('application/json')
-      
-//     });
-//     test("Text should be JSON", async () => {
-//         const response = await request(app).get("/");
-//         jsonText = {info: 'Node.js, Express, and Postgres API'}
-//         expect(response.body).toEqual(jsonText)
-        
-//       });
+});
 
-//   });
+//How to only mock auth for 1 test

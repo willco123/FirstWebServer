@@ -2,8 +2,8 @@
 
 
 module.exports = function(req, res, next){
-  console.log(req.user)
-  if (req.user.rank != "Admin") return res.status(403).send('Forbidden');
+  
+  if (res.locals.user.isAdmin != "admin") return res.status(403).send('Forbidden');
   
   next();
 

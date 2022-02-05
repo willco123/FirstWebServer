@@ -1,28 +1,3 @@
-
-//Below code was for express validator, will use joi instead for now
-//console.log(Object.getOwnPropertyNames(checkSchema))//Length,name,prototype
-
-
-// const userLoginSchema = {
-//   password: {
-//     isStrongPassword: {
-//       minLength: 8,
-//       minLowercase: 1,
-//       minUppercase: 1,
-//       minNumbers: 1
-//     },
-//     errorMessage: "Password must be greater than 8 and contain at least one uppercase letter, one lowercase letter, and one number"
-//     },
-//   username:{
-//     minLength:8
-//   }
-
-// }
-
-// module.exports = {
-//   userLoginSchema
-// }
-
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 

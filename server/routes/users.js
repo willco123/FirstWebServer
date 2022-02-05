@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const {auth, admin} = require('../middleware/auth');
-//const admin = require('../middleware/admin');
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const db = require('../startup/db');
 const {validateUser, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
@@ -14,7 +14,11 @@ router.get('/', [auth], async (req,res) => {
 
   try{
   users = await db.query('SELECT * FROM users')
-  res.send(users.rows)
+  
+  res.json(users.rows)
+  
+  
+
   }
   catch(err){
     console.log(err.stack);
@@ -28,6 +32,7 @@ router.get('/:id', [auth], async (req,res) => {
   try{
 
   users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])
+  if (users.rowCount===0) return res.status(404).send('A user with that given id cannot be found')
   res.send(users.rows)
   }
   catch(err){
