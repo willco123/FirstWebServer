@@ -22,8 +22,8 @@ const {
         createMockUsers,
         getMockPosts,
         getMockUsersPosts} = require('../../../tests/test-helpers');
-const bcrypt = require('bcrypt');
-const res = require('express/lib/response');
+// const bcrypt = require('bcrypt');
+// const res = require('express/lib/response');
 // const { user } = require('pg/lib/defaults');
 //console.log(user)
 // const db = require('../../startup/db');

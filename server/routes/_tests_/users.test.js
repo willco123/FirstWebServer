@@ -29,7 +29,6 @@ beforeEach( async () => {
     await clearMockDB();
     await populateMockUser(mockUser1);
     await populateMockUser(mockUser2);
-    var users = await getMockUsers();
     //await populateMockUser(mockUser3);
 })
 

@@ -24,10 +24,12 @@ router.post('/', async (req, res) => {
 
   userPassword = user.rows[0].password
   const validPassword = await bcrypt.compare(req.body.password, userPassword);
-  if (!validPassword) return res.status(400).send('Invalid email or password.');
+  if (!validPassword) return res.status(400).send('Invalid username or password.');
 
   const token = generateAuthToken(user.rows[0].user_id, user.rows[0].rank);
-  res.send(token);
+
+
+  return res.set('x-auth-token', [token]).send('Login Successful')//Will change to cookies later
   
 
 });
