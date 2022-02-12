@@ -6,7 +6,7 @@ const db = require('../startup/db');
 const {validateUser, generateAuthToken} = require('../validation/validators');
 //const logger = require('winston');
 const _ = require('lodash');
-const bcrypt= require("bcrypt");
+const bcrypt = require("bcrypt");
 
 
 
@@ -30,7 +30,7 @@ router.get('/:id', [auth], async (req,res) => {
 
   users = await db.query('SELECT * FROM users WHERE user_id = $1', [req.params.id])
   if (users.rowCount===0) return res.status(404).send('A user with that given id cannot be found')
-  res.send(users.rows)
+  return res.send(users.rows)
   }
   catch(err){
     console.log(err.stack);
@@ -62,7 +62,7 @@ router.post('/', async (req,res) => {
     
     //Get token
     const token = generateAuthToken(user.rows[0].user_id)
-    res.set('x-auth-token', token).status(201).send('Successfully added new user');
+    return res.set('x-auth-token', token).status(201).send('Successfully added new user');
 
   }
   catch(err){
@@ -86,15 +86,24 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
   password = await bcrypt.hash(password, salt);
 
   try{
-    await db.query('UPDATE users SET username = $1, password = $2, email = $3 \
+    itemExists = await db.query('SELECT * FROM users WHERE username = $1 OR email = $2 EXCEPT SELECT * FROM users WHERE user_id = $3 ', [username, email, id])
+    if (itemExists.rowCount >= 1) return res.status(400).send('A user with that username/email exists')
+    updatedItem = await db.query('UPDATE users SET username = $1, password = $2, email = $3 \
                     WHERE user_id = $4',
                     [username, password, email, id]);
+    if (updatedItem.rowCount === 0) return res.status(404).send('A user with the given ID was not found')//If rowCount==0 no item found in table with that id, 1 otherwise
+    
+        
     //return modified user
-    res.status(200).send('Record Successfully Updated');
+    return res.status(200).send('Record Successfully Updated');
   }
   catch(err){
     console.log(err.stack)
   }
+
+  //Need to add failed additions catch here
+  //If trying to change user/email to one that already exists res(error)
+  //if user not found then res(no user)
 
 })
 
@@ -108,18 +117,20 @@ router.delete('/:id', [auth, admin], async (req,res) => {//add transaction here?
     //if i want to delete from posts aswell i can just get it here
     deletedItem = await client.query('DELETE FROM users WHERE user_id=$1 RETURNING *',
                                    [req.params.id])
+      
     await client.query('COMMIT')
     if (deletedItem.rowCount === 0)//If rowCount==0 no item found in table with that id, 1 otherwise
       return res.status(404)
         .send('A customer with the given ID was not found')
 
-    res.status(201).send('Record Successfully deleted')
+    return res.status(201).send('Record Successfully deleted')
 
   }
   catch(err){
     console.log(err.stack)
-    console.log('here roll back')
+    console.log('An error occurred')
     await client.query('ROLLBACK')
+    return res.status(500).send('An error occurred')
   } finally{
     client.release(true)
   }

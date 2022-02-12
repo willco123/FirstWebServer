@@ -21,7 +21,7 @@ router.get('/', [auth], async (req,res) => {
   try{
     posts = await db.query('SELECT * FROM posts')
 
-    res.send(posts.rows)
+    return res.send(posts.rows)
     
   }
   catch(err){
@@ -47,6 +47,8 @@ router.get('/:id', [auth, admin], async (req,res) => {
 router.post('/', [auth], async (req,res) => {
   const {error} = validateMessage(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+  
+
 
   const message = req.body.message;
   const user = res.locals.user;

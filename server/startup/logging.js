@@ -3,6 +3,13 @@ const {format} = winston
 const path = require('path')
 
 
+// const prettyJson = format.printf(info => {
+//   if (info.message.constructor === Object) {
+//     info.message = JSON.stringify(info.message, null, 4)
+//   }
+//   return `${info.level}: ${info.message}`
+// })
+
 const logFormat = format.printf(info =>
   `${info.timestamp} ${info.level} [${info.label}]: ${info.message}`
 );
@@ -12,7 +19,9 @@ const logger = winston.createLogger({
   format: format.combine(
   format.label({ label: path.basename(require.main.filename) }),
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  format.errors({stack: true})
+  format.errors({stack: true}),
+
+
 
   ),
 
@@ -37,9 +46,9 @@ const logger = winston.createLogger({
       handleExceptions: true,//seems to effect both log files & console
       handleRejections: true,
       format: format.combine(
-        format.colorize(),
-        format.splat(),//Useful for logging JSON objects
-        logFormat
+        format.colorize(),//Useful for logging JSON objects
+        logFormat,
+
       )
     }),
   ],
