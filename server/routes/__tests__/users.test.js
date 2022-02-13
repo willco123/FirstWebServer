@@ -1,6 +1,6 @@
 jest.mock('../../middleware/auth', () => jest.fn((req,res,next) => next()));
 jest.mock('../../middleware/admin', () => jest.fn((req,res,next) => next()));
-var validateJWT = require('../../validation/validators');
+var validateJWT = require('../../utils/validators');
 const jwtMock = jest.spyOn(validateJWT, 'generateAuthToken')
 jwtMock.mockImplementation(()=> ('Fake JWT'));
 
@@ -40,7 +40,7 @@ afterEach(async () => {
 
 describe('/users', () => {
 
-  describe('get', () => {
+  describe('GET', () => {
 
     it('Should call the middleware using the mock function', async () => {
       const response = await supertest(app).get('/users');
@@ -62,7 +62,7 @@ describe('/users', () => {
   });
 
 
-  describe('get/:id' , () =>{
+  describe('GET/:id' , () =>{
 
     it('Should return 404 if no id is found', async ()=>{
       const response = await supertest(app).get('/users/1')
@@ -78,7 +78,7 @@ describe('/users', () => {
 
   });
 
-  describe('post', ()=>{
+  describe('POST', ()=>{
 
     it('Should return 400 if format is incorrect', async ()=>{
       const response = await supertest(app)
@@ -144,7 +144,7 @@ describe('/users', () => {
 
   })
 
-  describe('put', ()=>{
+  describe('PUT', ()=>{
     
     it('Should return 400 if body is not proper format', async ()=>{
       putUsers = await getMockUsers()

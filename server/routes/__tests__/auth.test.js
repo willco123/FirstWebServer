@@ -1,5 +1,5 @@
 //just see if username/password is correct/incorrect, if correct expect "mock" token, if not 400
-var validateJWT = require('../../validation/validators');
+var validateJWT = require('../../utils/validators');
 const jwtMock = jest.spyOn(validateJWT, 'generateAuthToken')
 jwtMock.mockImplementation(()=> ('Fake JWT'));
 

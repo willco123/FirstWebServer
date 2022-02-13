@@ -7,9 +7,9 @@ generateAuthToken = function(user_id, rank = "standard") {
 }
 
 
-function validateUser(user){
+function validateUser(user){//Need to add no white space validation to username/email/password, email might be chill with it
     const schema = Joi.object({
-        username: Joi.string().min(5).max(50).required(),
+        username: Joi.string().alphanum().min(5).max(50).required(),
         email: Joi.string().min(5).max(50).required().email(),
         password: Joi.string().min(5).max(255).required()
         //rank: Joi.string('')

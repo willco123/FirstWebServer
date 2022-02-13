@@ -4,7 +4,7 @@ const {loginArray} = require('./users');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../startup/db');
-const {generateAuthToken} = require('../validation/validators');
+const {generateAuthToken} = require('../utils/validators');
 const _ = require('lodash');
 
 //This page will be the login page, user will get session token from here upon login

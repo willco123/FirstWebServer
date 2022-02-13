@@ -5,7 +5,7 @@ jest.mock('../../middleware/auth', () => jest.fn((req,res,next) => {
     next()
 }));
 jest.mock('../../middleware/admin', () => jest.fn((req,res,next) => next()));
-var validateJWT = require('../../validation/validators');
+var validateJWT = require('../../utils/validators');
 const jwtMock = jest.spyOn(validateJWT, 'generateAuthToken')
 jwtMock.mockImplementation(()=> ('Fake JWT'));
 
@@ -59,7 +59,7 @@ afterEach(async () => {
 
 describe('/posts', () => {
 
-  describe('get', () => {
+  describe('GET', () => {
 
     it('Should call the middleware using the mock function', async () => {
 
@@ -82,7 +82,7 @@ describe('/posts', () => {
   });
 
 
-  describe('get/:id' , () =>{
+  describe('GET/:id' , () =>{
 
     it('Should return 404 if no id is found', async ()=>{
       const response = await supertest(app).get('/posts/1')
@@ -98,7 +98,7 @@ describe('/posts', () => {
 
   });
 
-  describe('post', ()=>{
+  describe('POST', ()=>{
 
     it('Should return 400 if no message', async ()=>{//will more in depth unit test for this
         users = await getMockUsers();
@@ -126,7 +126,7 @@ describe('/posts', () => {
 
   })
 
-  describe('put', ()=>{
+  describe('PUT', ()=>{
     
     it('Should return 400 if no message', async ()=>{//will more in depth unit test for this
         posts = await getMockPosts();
