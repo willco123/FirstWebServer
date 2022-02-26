@@ -33,7 +33,7 @@ describe('Auth Middleware', () => {
             status: function (arg){//doesn't like arrow notation here
                 this.statusCode = (arg)//arrow function doesnt have its own this value
                 return this
-            },//dont have to mock here, but maybe who knows
+            },//dont have to mock here, but maybe who knows, probably will have to for actual test as res will be used by http module
             send: jest.fn(function (arg){
                 this.sendText = (arg)
                 return this
