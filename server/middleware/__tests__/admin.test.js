@@ -11,10 +11,10 @@ describe('Admin Middleware', () => {
             },
             statusCode: {},
             sendText:{},
-            status: function (arg){//doesn't like arrow notation here
-                this.statusCode = (arg)//arrow function doesnt have its own this value
+            status: function (arg){
+                this.statusCode = (arg)
                 return this
-            },//dont have to mock here, but maybe who knows
+            },
             send: jest.fn(function (arg){
                 this.sendText = (arg)
                 return this

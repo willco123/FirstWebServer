@@ -1,6 +1,3 @@
-//This middleware will determine if a user has a JWT and only allow the user
-//to progress if they do
-
 const jwt = require('jsonwebtoken');
 
 function auth(req, res, next){
@@ -18,13 +15,6 @@ function auth(req, res, next){
   }
 
 }
-
-// function admin(req, res, next){
-//   if (res.locals.user.isAdmin != "admin") return res.status(403).send('Forbidden');
-  
-//   next();
-
-// }
 
 module.exports = auth;
 

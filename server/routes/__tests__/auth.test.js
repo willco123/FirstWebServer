@@ -38,7 +38,7 @@ describe('/auth', () => {
 
     describe('POST', ()=>{
 
-        it('Should return 400 if username does not match', async ()=>{//will more in depth unit test for this
+        it('Should return 400 if username does not match', async ()=>{
             userInvalidUsername = _.omit(mockUser1, ['username'])
             userInvalidUsername.username = 'notAValidUsername'
             const response = await supertest(app)
@@ -48,7 +48,7 @@ describe('/auth', () => {
             expect(response.text).toMatch('Invalid username or password.')
         })
 
-        it('Should return 400 if password does not match', async ()=>{//will more in depth unit test for this
+        it('Should return 400 if password does not match', async ()=>{
             userInvalidPassword = _.omit(mockUser1, ['password'])
             userInvalidPassword.password = 'notAValidPassword'
             const response = await supertest(app)

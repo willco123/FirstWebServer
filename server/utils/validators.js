@@ -2,17 +2,16 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 
 generateAuthToken = function(user_id, rank = "standard") {
-  const token = jwt.sign({id: user_id, isAdmin: rank}, process.env.SECRET_KEY, {expiresIn: 86400});//payload will just be id for now
+  const token = jwt.sign({id: user_id, isAdmin: rank}, process.env.SECRET_KEY, {expiresIn: 86400});
   return token;
 }
 
 
-function validateUser(user){//Need to add no white space validation to username/email/password, email might be chill with it
+function validateUser(user){
     const schema = Joi.object({
         username: Joi.string().alphanum().min(5).max(50).required(),
         email: Joi.string().min(5).max(50).required().email(),
         password: Joi.string().min(5).max(255).required()
-        //rank: Joi.string('')
     });
     return schema.validate(user);
 };

@@ -100,7 +100,7 @@ describe('/posts', () => {
 
   describe('POST', ()=>{
 
-    it('Should return 400 if no message', async ()=>{//will more in depth unit test for this
+    it('Should return 400 if no message', async ()=>{
         users = await getMockUsers();
         user1 = users.rows[0]
         user1.id = user1.user_id
@@ -128,7 +128,7 @@ describe('/posts', () => {
 
   describe('PUT', ()=>{
     
-    it('Should return 400 if no message', async ()=>{//will more in depth unit test for this
+    it('Should return 400 if no message', async ()=>{
         posts = await getMockPosts();
         post1 = post.rows[0]
         post1.id = post1.post_id
@@ -139,7 +139,7 @@ describe('/posts', () => {
         expect(response.text).toMatch('"message" is required')
     })
 
-    it('Should return 400 if bad id', async ()=>{//will more in depth unit test for this
+    it('Should return 400 if bad id', async ()=>{
         posts = await getMockPosts();
         post1 = post.rows[0]
         post1.id = post1.post_id
@@ -151,7 +151,7 @@ describe('/posts', () => {
     })
 
 
-    it('Should return 200', async ()=>{//will more in depth unit test for this
+    it('Should return 200', async ()=>{
         posts = await getMockPosts();
         post1 = posts.rows[0]
         post1.id = post1.post_id
@@ -182,10 +182,3 @@ describe('/posts', () => {
   })
 });
 
-//How to only mock auth for 1 test
-//Want tests where auth is mocked & auth is not
-//Probably have seperate suite for auth testing, just mock here always
-//Delete will require some form of transaction testing :/
-
-//method no-cors
-//header seems to like just text but not the object

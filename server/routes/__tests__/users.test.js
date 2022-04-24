@@ -123,7 +123,7 @@ describe('/users', () => {
 
     })
 
-    test('Check if x-auth-token is set in header, jwt func is mocked here', async ()=>{//maybe save this for a seperate testing suite
+    test('Check if x-auth-token is set in header, jwt func is mocked here', async ()=>{
       const response = await supertest(app)
         .post('/users')
         .send(_.omit(mockUser3, ['message']))
@@ -151,7 +151,7 @@ describe('/users', () => {
       putUser1 = putUsers.rows[0].user_id
       const response =await supertest(app)
         .put('/users/' + putUser1)
-        .send({"username": "hey"})//Will have a more indepth test for the validators unit test
+        .send({"username": "hey"})
       expect(response.statusCode).toBe(400);
     })
     it('Should return 400 if new username belongs to another record', async ()=>{
@@ -166,7 +166,7 @@ describe('/users', () => {
         })
       expect(response.statusCode).toBe(400);
     })
-    it('Should return 400 if new email belongs to another record', async ()=>{//this broke for no reason then fixed itself
+    it('Should return 400 if new email belongs to another record', async ()=>{
       putUsers = await getMockUsers()
       putUser1 = putUsers.rows[0].user_id
       const response =await supertest(app)
@@ -197,7 +197,7 @@ describe('/users', () => {
       putUser1ID = putUser1.user_id
       const response =await supertest(app)
         .put('/users/' + putUser1ID)
-        .send(_.omit(mockUser1, ['message']))//same details as the user its editing here, so its allowed for them to match
+        .send(_.omit(mockUser1, ['message']))
       expect(response.statusCode).toBe(200);
       expect(response.text).toEqual('Record Successfully Updated')
     })
@@ -224,20 +224,15 @@ describe('/users', () => {
 
     test('404 is no record found', async ()=>{
       response = await supertest(app).delete('/users/1')
-      expect(response.statusCode).toBe(404)//Could check DB but won't
+      expect(response.statusCode).toBe(404)
     })
 
     test('Record Should be deleted', async ()=>{
       var deletedUsers = await getMockUsers()
       deletedUser1 = deletedUsers.rows[0].user_id
       response = await supertest(app).delete('/users/' + deletedUser1)
-      expect(response.statusCode).toBe(201)//Could check DB but won't
+      expect(response.statusCode).toBe(201)
     })
 
   })
 });
-
-//How to only mock auth for 1 test
-//Want tests where auth is mocked & auth is not
-//Probably have seperate suite for auth testing, just mock here always
-//Delete will require some form of transaction testing :/
