@@ -29,9 +29,7 @@ router.post('/', async (req, res) => {
   const token = generateAuthToken(user.rows[0].user_id, user.rows[0].rank);
 
 
-  return res.set('x-auth-token', [token]).send('Login Successful')//Will change to cookies later
-  
-
+  return res.set('x-auth-token', [token]).send('Login Successful')
 });
 
 

@@ -101,9 +101,7 @@ router.put('/:id', [auth, admin], async (req,res) => {//Make sure to change ID's
     console.log(err.stack)
   }
 
-  //Need to add failed additions catch here
-  //If trying to change user/email to one that already exists res(error)
-  //if user not found then res(no user)
+
 
 })
 
